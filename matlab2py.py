@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+import os
 import csv
 import json
 import numpy as np
@@ -31,5 +32,12 @@ def to_csv(dict_obj, filename):
         spamwriter.writerows(dict_obj.items())
 
 if __name__ == '__main__':
-    obj = load_from_matlab('data/matlab.mat')
-    to_csv(obj, 'data/matlab.csv')
+    path = 'data/'
+    file_list = []
+    list_dir = os.walk(path)
+    for root, dirs, files in list_dir:
+        for current in files:
+            (file_name, extension) = os.path.splitext(current)
+            if(extension == ".mat"):
+                obj = load_from_matlab(path+current)
+                to_csv(obj, path + file_name + '.csv')
