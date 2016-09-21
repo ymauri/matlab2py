@@ -14,11 +14,19 @@ def load_from_matlab(filename):
     :rtype: dict
     """
     matlab_obj = sio.loadmat(filename)
+    information = {}
+    rate = {}
     container = {}    
     for var in matlab_obj:
-        if len(matlab_obj[var]):
+        if (len(matlab_obj[var]) and str(var) != "__version__" and str(var) != "__header__"):
             tmp = np.array(matlab_obj[var][0]).tolist()
-            container[var] = ','.join(str(np.array(e).tolist()[0]) for e in tmp[0][0])         
+            information[var] = ','.join(str(np.array(e).tolist()[0]) for e in tmp[0][0])
+            current_rate = 0
+            if len(tmp[0]):
+                current_rate = np.array(tmp[0][1]).tolist()[0][0]
+            rate[var] = current_rate
+    container[0] = information
+    container[1] = rate
     return container
 
 def to_csv(dict_obj, filename):
@@ -40,4 +48,5 @@ if __name__ == '__main__':
             (file_name, extension) = os.path.splitext(current)
             if(extension == ".mat"):
                 obj = load_from_matlab(path+current)
-                to_csv(obj, path + file_name + '.csv')
+                to_csv(obj[0], path + file_name + '.csv')
+                to_csv(obj[1], path + file_name + '_rate.csv')
